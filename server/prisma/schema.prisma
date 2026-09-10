@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum EquipmentStatus {
+  operational
+  under_maintenance
+  out_of_service
+  retired
+}
+
+enum RepeatType {
+  daily
+  weekly
+  monthly
+  yearly
+  weekdays
+  custom
+}
+
+enum RepeatUnit {
+  days
+  weeks
+  months
+}
+
+enum MaintenanceType {
+  preventive
+  corrective
+  inspection
+}
+
+enum MaintenanceStatus {
+  scheduled
+  in_progress
+  completed
+  overdue
+}
+
+model Equipment {
+  id                  Int              @id @default(autoincrement())
+  name                String
+  category            String
+  location            String
+  assignedTechnician  String           @map("assigned_technician")
+  status              EquipmentStatus  @default(operational)
+  repeatType          RepeatType       @default(monthly) @map("repeat_type")
+  repeatInterval      Int?             @map("repeat_interval")
+  repeatUnit          RepeatUnit?      @map("repeat_unit")
+  fixedInterval       Boolean          @default(true) @map("fixed_interval")
+  nextMaintenanceDate DateTime?        @map("next_maintenance_date") @db.Date
+  expiryDate          DateTime?        @map("expiry_date") @db.Date
+  notes               String?          @db.Text
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+  records             MaintenanceRecord[]
+
+  @@index([name])
+  @@index([assignedTechnician])
+  @@map("equipment")
+}
+
+model MaintenanceRecord {
+  id              Int               @id @default(autoincrement())
+  equipmentId     Int               @map("equipment_id")
+  type            MaintenanceType   @default(preventive)
+  description     String            @db.Text
+  assignedTo      String            @map("assigned_to")
+  scheduledDate   DateTime          @map("scheduled_date") @db.Date
+  completedDate   DateTime?         @map("completed_date") @db.Date
+  status          MaintenanceStatus @default(scheduled)
+  completionNotes String?           @map("completion_notes") @db.Text
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  equipment       Equipment         @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@index([equipmentId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@map("maintenance_records")
+}
