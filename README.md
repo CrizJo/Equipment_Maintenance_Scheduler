@@ -1,6 +1,6 @@
 # EquipSync
 
-Full-stack equipment maintenance scheduler.
+This is a full-stack equipment maintenance scheduler website.
 
 ## Stack
 
