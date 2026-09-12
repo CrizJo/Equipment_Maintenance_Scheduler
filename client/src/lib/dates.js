@@ -1,12 +1,28 @@
+function pad(value) {
+  return String(value).padStart(2, "0");
+}
+
+function fromLocalDate(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 export function toDayKey(value) {
   if (!value) return "";
-  return String(value).slice(0, 10);
+  if (value instanceof Date) return fromLocalDate(value);
+
+  const str = String(value).trim();
+  const isoDate = str.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (isoDate) return isoDate[1];
+
+  return fromLocalDate(new Date(str));
 }
 
 export function formatDayLabel(value) {
   const key = toDayKey(value);
   if (!key) return "—";
   const date = new Date(`${key}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return "—";
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
@@ -23,7 +39,7 @@ export function buildMonthCells(year, month) {
   for (let i = 0; i < firstWeekday; i += 1) {
     const day = prevMonthDays - firstWeekday + 1 + i;
     cells.push({
-      key: toDayKey(new Date(year, month - 1, day)),
+      key: fromLocalDate(new Date(year, month - 1, day)),
       day,
       inMonth: false,
     });
@@ -31,7 +47,7 @@ export function buildMonthCells(year, month) {
 
   for (let day = 1; day <= daysInMonth; day += 1) {
     cells.push({
-      key: toDayKey(new Date(year, month, day)),
+      key: fromLocalDate(new Date(year, month, day)),
       day,
       inMonth: true,
     });
@@ -40,7 +56,7 @@ export function buildMonthCells(year, month) {
   let nextDay = 1;
   while (cells.length % 7 !== 0) {
     cells.push({
-      key: toDayKey(new Date(year, month + 1, nextDay)),
+      key: fromLocalDate(new Date(year, month + 1, nextDay)),
       day: nextDay,
       inMonth: false,
     });
@@ -51,5 +67,5 @@ export function buildMonthCells(year, month) {
 }
 
 export function todayKey() {
-  return toDayKey(new Date());
+  return fromLocalDate(new Date());
 }

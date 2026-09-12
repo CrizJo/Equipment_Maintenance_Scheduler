@@ -1,8 +1,13 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { buildMonthCells, monthTitle, todayKey } from "../../lib/dates.js";
-import { TASK_STATUS_STYLES } from "../../lib/maintenanceUi.js";
+import { TASK_STATUS_STYLES, TYPE_STYLES } from "../../lib/maintenanceUi.js";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function pillClass(task) {
+  if (task.status === "overdue") return TASK_STATUS_STYLES.overdue;
+  return TYPE_STYLES[task.type] || TASK_STATUS_STYLES[task.status] || "bg-slate-100 text-slate-600";
+}
 
 export default function MonthCalendar({ year, month, tasksByDay, selectedDay, onSelectDay, onPrev, onNext }) {
   const cells = buildMonthCells(year, month);
@@ -34,13 +39,18 @@ export default function MonthCalendar({ year, month, tasksByDay, selectedDay, on
         {cells.map((cell) => {
           const dayTasks = tasksByDay[cell.key] || [];
           const isSelected = selectedDay === cell.key;
+          const hasTasks = dayTasks.length > 0;
           return (
             <button
               key={cell.key}
               type="button"
               onClick={() => onSelectDay(cell.key)}
-              className={`min-h-[92px] rounded-2xl p-2 text-left transition ${
-                isSelected ? "bg-[#eef1ff] ring-1 ring-[#3b5bdb]/30" : "hover:bg-[#f5f5f7]"
+              className={`min-h-[108px] rounded-2xl border p-2 text-left transition ${
+                isSelected
+                  ? "border-[#3b5bdb] bg-[#eef1ff] ring-1 ring-[#3b5bdb]/30"
+                  : hasTasks
+                    ? "border-[#ececef] bg-[#fbfbfc] hover:bg-[#f5f5f7]"
+                    : "border-transparent hover:bg-[#f5f5f7]"
               } ${cell.inMonth ? "text-[#1d1d1f]" : "text-[#c7c7cc]"}`}
             >
               <span
@@ -54,7 +64,9 @@ export default function MonthCalendar({ year, month, tasksByDay, selectedDay, on
                 {dayTasks.slice(0, 2).map((task) => (
                   <p
                     key={task.id}
-                    className={`truncate rounded-full px-2 py-0.5 text-[10px] font-medium ${TASK_STATUS_STYLES[task.status]}`}
+                    className={`truncate rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                      cell.inMonth ? pillClass(task) : "bg-[#f2f2f7] text-[#aeaeb2]"
+                    }`}
                   >
                     {task.equipment?.name || "Task"}
                   </p>
