@@ -95,19 +95,22 @@ export default function EquipmentModal({ title, initial, technicians, saving, er
             </select>
           </Field>
           <Field label="Assigned To">
-            <input
+            <select
               required
-              list="technician-names"
               value={form.assignedTechnician}
               onChange={(event) => update({ assignedTechnician: event.target.value })}
-              placeholder="e.g., John Smith"
               className={inputClass}
-            />
-            <datalist id="technician-names">
+            >
+              <option value="">Select an operator</option>
               {technicians.map((name) => (
-                <option key={name} value={name} />
+                <option key={name} value={name}>
+                  {name}
+                </option>
               ))}
-            </datalist>
+              {form.assignedTechnician && !technicians.includes(form.assignedTechnician) && (
+                <option value={form.assignedTechnician}>{form.assignedTechnician}</option>
+              )}
+            </select>
           </Field>
         </div>
 

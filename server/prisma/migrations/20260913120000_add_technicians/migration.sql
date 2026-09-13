@@ -1,0 +1,17 @@
+-- CreateTable
+CREATE TABLE `technicians` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `notes` TEXT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `technicians_name_key`(`name`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Copy existing assigned names so current data stays usable
+INSERT INTO `technicians` (`name`, `created_at`, `updated_at`)
+SELECT DISTINCT `assigned_technician`, CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3)
+FROM `equipment`
+WHERE `assigned_technician` IS NOT NULL AND `assigned_technician` <> '';

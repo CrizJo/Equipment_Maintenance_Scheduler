@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { api, setApiIdentity } from "../lib/api.js";
 
 const RoleContext = createContext(null);
@@ -6,6 +6,11 @@ const RoleContext = createContext(null);
 const ROLES = ["Admin", "Manager", "Technician"];
 const ROLE_KEY = "equipsync.role";
 const TECH_KEY = "equipsync.technicianName";
+
+function namesFromPayload(rows) {
+  if (!Array.isArray(rows)) return [];
+  return rows.map((row) => (typeof row === "string" ? row : row.name)).filter(Boolean);
+}
 
 export function RoleProvider({ children }) {
   const [role, setRoleState] = useState(() => localStorage.getItem(ROLE_KEY) || "Manager");
@@ -18,17 +23,21 @@ export function RoleProvider({ children }) {
     setApiIdentity(role, technicianName);
   }, [role, technicianName]);
 
-  useEffect(() => {
-    api("/api/technicians")
-      .then((names) => {
-        setTechnicians(names);
-        if (!localStorage.getItem(TECH_KEY) && names[0]) {
-          setTechnicianState(names[0]);
-          localStorage.setItem(TECH_KEY, names[0]);
-        }
-      })
-      .catch(() => setTechnicians([]));
+  const refreshTechnicians = useCallback(async (rows) => {
+    const names = namesFromPayload(rows ?? (await api("/api/technicians")));
+    setTechnicians(names);
+    setTechnicianState((current) => {
+      if (names.includes(current)) return current;
+      const next = names[0] || "";
+      localStorage.setItem(TECH_KEY, next);
+      return next;
+    });
+    return names;
   }, []);
+
+  useEffect(() => {
+    refreshTechnicians().catch(() => setTechnicians([]));
+  }, [refreshTechnicians]);
 
   function setRole(next) {
     setApiIdentity(next, technicianName);
@@ -47,11 +56,14 @@ export function RoleProvider({ children }) {
       technicianName,
       setTechnicianName,
       technicians,
+      refreshTechnicians,
       roles: ROLES,
       canManageEquipment: role === "Admin" || role === "Manager",
       canDeleteEquipment: role === "Admin",
+      canManageOperators: role === "Admin" || role === "Manager",
+      canDeleteOperators: role === "Admin",
     }),
-    [role, technicianName, technicians]
+    [role, technicianName, technicians, refreshTechnicians]
   );
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;

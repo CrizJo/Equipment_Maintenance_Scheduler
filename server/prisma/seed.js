@@ -10,6 +10,19 @@ function d(iso) {
 async function main() {
   await prisma.maintenanceRecord.deleteMany();
   await prisma.equipment.deleteMany();
+  await prisma.technician.deleteMany();
+
+  const operatorNames = [
+    "John Smith",
+    "Sarah Chen",
+    "Alex Park",
+    "Dr. Rachel Kim",
+    "Emily Wang",
+    "Tom Harris",
+  ];
+  await prisma.technician.createMany({
+    data: operatorNames.map((name) => ({ name })),
+  });
 
   const created = [];
   const rows = [

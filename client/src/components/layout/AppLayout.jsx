@@ -6,6 +6,7 @@ import {
   History,
   LayoutDashboard,
   LogOut,
+  Users,
   Wrench,
 } from "lucide-react";
 import { useState } from "react";
@@ -14,6 +15,7 @@ import { useRole } from "../../context/RoleContext.jsx";
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/equipment", label: "Equipment", icon: Wrench },
+  { to: "/operators", label: "Operators", icon: Users, roles: ["Admin", "Manager"] },
   { to: "/schedule", label: "Schedule", icon: CalendarDays },
   { to: "/history", label: "History", icon: History },
 ];
@@ -82,7 +84,7 @@ export default function AppLayout() {
         )}
 
         <nav className="flex flex-1 flex-col gap-1 px-3">
-          {NAV.map((item) => {
+          {NAV.filter((item) => !item.roles || item.roles.includes(role)).map((item) => {
             const Icon = item.icon;
             return (
               <NavLink

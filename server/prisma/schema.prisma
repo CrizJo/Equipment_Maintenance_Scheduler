@@ -42,6 +42,16 @@ enum MaintenanceStatus {
   overdue
 }
 
+model Technician {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  notes     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("technicians")
+}
+
 model Equipment {
   id                  Int              @id @default(autoincrement())
   name                String
