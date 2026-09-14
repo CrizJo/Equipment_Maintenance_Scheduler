@@ -45,7 +45,7 @@ export default function History() {
       const isPast = item.status === "completed";
       const matchesTab = tab === "past" ? isPast : !isPast;
       const matchesType = typeFilter === "all" || item.type === typeFilter;
-      const haystack = [item.equipment?.name, item.description, item.assignedTo, item.type]
+      const haystack = [item.equipment?.name, item.description, item.completionNotes, item.assignedTo, item.type]
         .join(" ")
         .toLowerCase();
       const matchesQuery = !needle || haystack.includes(needle);
@@ -130,7 +130,11 @@ export default function History() {
                 {record.type}
               </span>
             </span>
-            <span className="text-[#6e6e73]">{record.description}</span>
+            <span className="text-[#6e6e73]">
+              {record.status === "completed" && record.completionNotes
+                ? record.completionNotes
+                : record.description}
+            </span>
             <span className="text-[#6e6e73]">{record.assignedTo}</span>
             <span className="flex items-center gap-1 text-[#6e6e73]">
               <Calendar size={14} /> {formatDayLabel(record.scheduledDate)}

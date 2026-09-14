@@ -1,9 +1,20 @@
 import { addDays, addWeeks, addMonths, addYears, isWeekend, nextMonday } from "date-fns";
 
-function asDate(value) {
+export function asDate(value) {
+  if (!value) return new Date(NaN);
+  if (typeof value === "string") {
+    const isoDate = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (isoDate) {
+      return new Date(Number(isoDate[1]), Number(isoDate[2]) - 1, Number(isoDate[3]));
+    }
+  }
   const date = value instanceof Date ? new Date(value) : new Date(value);
-  date.setHours(0, 0, 0, 0);
-  return date;
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+export function toDbDate(value) {
+  const date = asDate(value);
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 }
 
 export function calculateNextDate(fromDate, config) {
@@ -34,6 +45,17 @@ export function calculateNextDate(fromDate, config) {
     default:
       return addMonths(from, 1);
   }
+}
+
+export function nextDueAfterComplete(scheduledDate, completedDate, config) {
+  const done = asDate(completedDate);
+  let next = calculateNextDate(scheduledDate || completedDate, config);
+  let guard = 0;
+  while (!Number.isNaN(next.getTime()) && asDate(next) <= done && guard < 60) {
+    next = calculateNextDate(next, config);
+    guard += 1;
+  }
+  return toDbDate(next);
 }
 
 export function expiryFlags(expiryDate, today = new Date()) {

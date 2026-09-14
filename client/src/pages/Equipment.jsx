@@ -2,10 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import { MapPin, MoreHorizontal, Search, User } from "lucide-react";
 import PageHeader from "../components/layout/PageHeader.jsx";
 import EquipmentModal from "../components/equipment/EquipmentModal.jsx";
+import TaskDrawer from "../components/schedule/TaskDrawer.jsx";
 import { repeatSummary } from "../components/equipment/RepeatPicker.jsx";
 import { api } from "../lib/api.js";
 import { useRole } from "../context/RoleContext.jsx";
 import { emptyEquipmentForm, equipmentToForm, formatDisplayDate } from "../lib/equipmentForm.js";
+import {
+  canShowCompleteService,
+  openMaintenanceRecord,
+  serviceTaskFromEquipment,
+} from "../lib/maintenanceUi.js";
 
 const STATUS_STYLES = {
   operational: "bg-emerald-50 text-emerald-700",
@@ -40,6 +46,7 @@ export default function Equipment() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
   const [menuId, setMenuId] = useState(null);
+  const [serviceItem, setServiceItem] = useState(null);
 
   async function load() {
     setLoading(true);
@@ -85,6 +92,16 @@ export default function Equipment() {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function handleCompleteService(_id, completionNotes) {
+    if (!serviceItem) return;
+    await api(`/api/equipment/${serviceItem.id}/complete-service`, {
+      method: "POST",
+      body: { completionNotes },
+    });
+    setServiceItem(null);
+    await load();
   }
 
   async function handleDelete(item) {
@@ -219,12 +236,24 @@ export default function Equipment() {
               {repeatSummary(item.repeatType, item.repeatInterval, item.repeatUnit)}
               {item.fixedInterval ? " · Fixed interval" : " · Manual next date"}
             </p>
+            {openMaintenanceRecord(item) && (
+              <p className="mt-3 text-sm leading-5 text-[#6e6e73]">{openMaintenanceRecord(item).description}</p>
+            )}
             <div className="mt-5 flex items-center justify-between">
               <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[item.status]}`}>
                 {STATUS_LABELS[item.status]}
               </span>
               <span className="text-xs text-[#86868b]">Next: {formatDisplayDate(item.nextMaintenanceDate)}</span>
             </div>
+            {canShowCompleteService(role, technicianName, item) && (
+              <button
+                type="button"
+                onClick={() => setServiceItem(item)}
+                className="mt-4 w-full rounded-full bg-[#1d1d1f] py-2.5 text-sm font-medium text-white"
+              >
+                Complete service
+              </button>
+            )}
           </article>
         ))}
       </div>
@@ -242,6 +271,16 @@ export default function Equipment() {
           error={formError}
           onClose={() => setModal(null)}
           onSave={handleSave}
+        />
+      )}
+
+      {serviceItem && (
+        <TaskDrawer
+          task={serviceTaskFromEquipment(serviceItem)}
+          role={role}
+          technicianName={technicianName}
+          onClose={() => setServiceItem(null)}
+          onComplete={handleCompleteService}
         />
       )}
     </div>

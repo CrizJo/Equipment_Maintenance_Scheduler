@@ -31,3 +31,42 @@ export function canCompleteTask(role, technicianName, record) {
     record.assignedTo.toLowerCase() === technicianName.toLowerCase()
   );
 }
+
+const OPEN_TASK_STATUSES = ["scheduled", "in_progress", "overdue"];
+
+export function openMaintenanceRecord(item) {
+  return (item?.records || []).find((record) => OPEN_TASK_STATUSES.includes(record.status)) || null;
+}
+
+export function canCompleteEquipment(role, technicianName, item) {
+  if (!item || item.status === "retired") return false;
+  const open = openMaintenanceRecord(item);
+  if (open) return canCompleteTask(role, technicianName, open);
+  if (item.status !== "out_of_service" && item.status !== "under_maintenance") return false;
+  if (role === "Admin" || role === "Manager") return true;
+  return (
+    role === "Technician" &&
+    technicianName &&
+    item.assignedTechnician?.toLowerCase() === technicianName.toLowerCase()
+  );
+}
+
+export function canShowCompleteService(role, technicianName, item) {
+  if (!canCompleteEquipment(role, technicianName, item)) return false;
+  if (item.status === "out_of_service" || item.status === "under_maintenance") return true;
+  return role === "Technician";
+}
+
+export function serviceTaskFromEquipment(item) {
+  const open = openMaintenanceRecord(item);
+  if (open) return { ...open, equipment: item };
+  return {
+    id: `equipment-${item.id}`,
+    status: "in_progress",
+    assignedTo: item.assignedTechnician,
+    description: item.notes || `Complete service and return ${item.name} to operational status.`,
+    scheduledDate: item.nextMaintenanceDate || new Date().toISOString(),
+    type: "corrective",
+    equipment: item,
+  };
+}

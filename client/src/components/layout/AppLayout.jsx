@@ -26,9 +26,9 @@ export default function AppLayout() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex min-h-screen bg-[#f5f5f7] text-[#1d1d1f]">
+    <div className="flex h-screen overflow-hidden bg-[#f5f5f7] text-[#1d1d1f]">
       <aside
-        className={`relative flex shrink-0 flex-col border-r border-black/5 bg-[#0f1115] text-white transition-all duration-300 ${
+        className={`relative flex h-full shrink-0 flex-col border-r border-black/5 bg-[#0f1115] text-white transition-all duration-300 ${
           collapsed ? "w-[88px]" : "w-[248px]"
         }`}
       >
@@ -106,7 +106,7 @@ export default function AppLayout() {
         <button
           type="button"
           onClick={() => navigate("/")}
-          className={`mx-3 mb-4 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/8 hover:text-white ${
+          className={`mx-3 mt-auto mb-4 flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/8 hover:text-white ${
             collapsed ? "justify-center" : ""
           }`}
         >
@@ -124,7 +124,7 @@ export default function AppLayout() {
         </button>
       </aside>
 
-      <main className="min-w-0 flex-1">
+      <main className="min-w-0 flex-1 overflow-y-auto">
         <Outlet />
       </main>
     </div>

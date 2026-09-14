@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
-import { requireRoles } from "../middleware/role.js";
-import { refreshOverdue, serializeEquipment } from "../services/maintenance.js";
+import { canCompleteRecord, requireRoles } from "../middleware/role.js";
+import {
+  completeEquipmentService,
+  refreshOverdue,
+  serializeEquipment,
+} from "../services/maintenance.js";
 
 const router = Router();
 
@@ -17,7 +21,13 @@ router.get("/", async (req, res) => {
     await refreshOverdue();
     const items = await prisma.equipment.findMany({
       where: equipmentWhere(req),
-      include: { records: { orderBy: { scheduledDate: "desc" }, take: 5 } },
+      include: {
+        records: {
+          where: { status: { in: ["scheduled", "in_progress", "overdue"] } },
+          orderBy: { scheduledDate: "asc" },
+          take: 3,
+        },
+      },
       orderBy: { name: "asc" },
     });
     res.json(items.map(serializeEquipment));
@@ -39,6 +49,47 @@ router.get("/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to load equipment" });
+  }
+});
+
+router.post("/:id/complete-service", async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const equipment = await prisma.equipment.findFirst({
+      where: { id, ...equipmentWhere(req) },
+      include: {
+        records: {
+          where: { status: { in: ["scheduled", "in_progress", "overdue"] } },
+          orderBy: { scheduledDate: "asc" },
+          take: 1,
+        },
+      },
+    });
+    if (!equipment) return res.status(404).json({ error: "Equipment not found" });
+
+    if (req.role === "Technician") {
+      const assigned =
+        req.technicianName &&
+        equipment.assignedTechnician.toLowerCase() === req.technicianName.toLowerCase();
+      if (!assigned) {
+        return res.status(403).json({ error: "Technicians can only complete service on their assigned equipment." });
+      }
+    }
+
+    const open = equipment.records[0];
+    if (open && !canCompleteRecord(req, open)) {
+      return res.status(403).json({
+        error: "Technicians can only complete tasks assigned to them.",
+      });
+    }
+
+    const updated = await completeEquipmentService(id, {
+      completionNotes: req.body?.completionNotes,
+    });
+    res.json(updated);
+  } catch (error) {
+    console.error(error);
+    res.status(error.status || 500).json({ error: error.message || "Failed to complete service" });
   }
 });
 
