@@ -72,28 +72,27 @@ export default function Schedule() {
   }
 
   return (
-    <div className="px-8 py-8">
-      <PageHeader title="Schedule" />
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-      {loading && <p className="mb-4 text-sm text-[#6e6e73]">Loading schedule...</p>}
+    <div className="flex min-h-0 flex-col px-6 py-6 lg:px-8 lg:py-7">
+      <PageHeader title="Schedule" className="mb-5 shrink-0" />
+      {error && <p className="mb-3 shrink-0 text-sm text-red-600">{error}</p>}
+      {loading && <p className="mb-3 shrink-0 text-sm text-[#6e6e73]">Loading schedule...</p>}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.9fr)]">
-        <div className="overflow-x-auto">
-          <div className="min-w-[640px]">
-            <MonthCalendar
-              year={year}
-              month={month}
-              tasksByDay={tasksByDay}
-              selectedDay={selectedDay}
-              onSelectDay={(key) => setSelectedDay((current) => (current === key ? null : key))}
-              onPrev={() => shiftMonth(-1)}
-              onNext={() => shiftMonth(1)}
-            />
-          </div>
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="min-w-0">
+          <MonthCalendar
+            year={year}
+            month={month}
+            tasksByDay={tasksByDay}
+            selectedDay={selectedDay}
+            onSelectDay={(key) => setSelectedDay((current) => (current === key ? null : key))}
+            onPrev={() => shiftMonth(-1)}
+            onNext={() => shiftMonth(1)}
+          />
         </div>
 
-        <div className="rounded-[28px] bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-          <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="relative min-h-[280px] lg:min-h-0">
+          <div className="flex max-h-[50vh] min-h-0 flex-col overflow-hidden rounded-[28px] bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)] lg:absolute lg:inset-0 lg:max-h-none">
+          <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
             <h2 className="text-lg font-semibold tracking-tight">Tasks</h2>
             <div className="flex gap-1">
               {TASK_FILTERS.map((item) => (
@@ -111,17 +110,17 @@ export default function Schedule() {
             </div>
           </div>
           {selectedDay && (
-            <button type="button" onClick={() => setSelectedDay(null)} className="mb-3 text-xs text-[#3b5bdb]">
+            <button type="button" onClick={() => setSelectedDay(null)} className="mb-3 shrink-0 text-xs text-[#3b5bdb]">
               Showing {formatDayLabel(selectedDay)} · Clear day filter
             </button>
           )}
-          <div className="space-y-2">
+          <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1">
             {panelTasks.map((task) => (
               <button
                 key={task.id}
                 type="button"
                 onClick={() => setActiveTask(task)}
-                className="flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left hover:bg-[#f5f5f7]"
+                className="flex w-full items-start gap-2.5 rounded-2xl px-2.5 py-2.5 text-left hover:bg-[#f5f5f7]"
               >
                 <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${TASK_DOT_STYLES[task.status]}`} />
                 <span className="min-w-0 flex-1">
@@ -139,6 +138,7 @@ export default function Schedule() {
             {!loading && panelTasks.length === 0 && (
               <p className="px-2 py-8 text-sm text-[#6e6e73]">No tasks for this view.</p>
             )}
+          </div>
           </div>
         </div>
       </div>
