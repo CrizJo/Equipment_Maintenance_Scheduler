@@ -17,7 +17,6 @@ export default function StatusDonut({ data }) {
   return (
     <section className="rounded-3xl bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
       <h2 className="text-lg font-semibold tracking-tight text-[#1d1d1f]">Equipment by status</h2>
-      <p className="mt-1 text-sm text-[#6e6e73]">Live mix of the current fleet</p>
 
       {total === 0 ? (
         <p className="mt-16 text-center text-sm text-[#86868b]">No equipment to chart yet.</p>

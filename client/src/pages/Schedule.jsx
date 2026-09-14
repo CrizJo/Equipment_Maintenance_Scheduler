@@ -73,7 +73,7 @@ export default function Schedule() {
 
   return (
     <div className="px-8 py-8">
-      <PageHeader title="Schedule" subtitle="View and manage all maintenance schedules" />
+      <PageHeader title="Schedule" />
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
       {loading && <p className="mb-4 text-sm text-[#6e6e73]">Loading schedule...</p>}
 

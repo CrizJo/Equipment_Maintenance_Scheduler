@@ -55,7 +55,7 @@ export default function History() {
 
   return (
     <div className="px-8 py-8">
-      <PageHeader title="Maintenance History" subtitle="Complete log of all maintenance activities" />
+      <PageHeader title="Maintenance History" />
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

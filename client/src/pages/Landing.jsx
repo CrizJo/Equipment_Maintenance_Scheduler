@@ -73,7 +73,6 @@ export default function Landing() {
               Launch Dashboard
               <ArrowRight size={18} />
             </Link>
-            <p className="text-sm text-[#86868b]">No setup required · Demo data is ready</p>
           </div>
         </section>
 
