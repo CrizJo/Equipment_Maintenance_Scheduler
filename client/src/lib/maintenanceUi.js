@@ -1,13 +1,11 @@
 export const TASK_STATUS_STYLES = {
   scheduled: "bg-blue-50 text-blue-700",
-  in_progress: "bg-indigo-50 text-indigo-700",
   overdue: "bg-red-50 text-red-700",
   completed: "bg-emerald-50 text-emerald-700",
 };
 
 export const TASK_DOT_STYLES = {
   scheduled: "bg-blue-500",
-  in_progress: "bg-indigo-500",
   overdue: "bg-red-500",
   completed: "bg-emerald-500",
 };
@@ -32,7 +30,7 @@ export function canCompleteTask(role, technicianName, record) {
   );
 }
 
-const OPEN_TASK_STATUSES = ["scheduled", "in_progress", "overdue"];
+const OPEN_TASK_STATUSES = ["scheduled", "overdue"];
 
 export function openMaintenanceRecord(item) {
   return (item?.records || []).find((record) => OPEN_TASK_STATUSES.includes(record.status)) || null;
@@ -62,7 +60,7 @@ export function serviceTaskFromEquipment(item) {
   if (open) return { ...open, equipment: item };
   return {
     id: `equipment-${item.id}`,
-    status: "in_progress",
+    status: "scheduled",
     assignedTo: item.assignedTechnician,
     description: item.notes || `Complete service and return ${item.name} to operational status.`,
     scheduledDate: item.nextMaintenanceDate || new Date().toISOString(),

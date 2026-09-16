@@ -29,7 +29,6 @@ async function withStats() {
       operational: machines.filter((item) => item.status === "operational").length,
       openTasks: tasks.filter((item) => item.status !== "completed").length,
       overdue: tasks.filter((item) => item.status === "overdue").length,
-      inProgress: tasks.filter((item) => item.status === "in_progress").length,
       completed: tasks.filter((item) => item.status === "completed").length,
     };
   });

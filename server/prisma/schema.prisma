@@ -37,7 +37,6 @@ enum MaintenanceType {
 
 enum MaintenanceStatus {
   scheduled
-  in_progress
   completed
   overdue
 }

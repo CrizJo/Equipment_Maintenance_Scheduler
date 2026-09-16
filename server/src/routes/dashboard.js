@@ -34,8 +34,7 @@ router.get("/stats", async (_req, res) => {
     res.json({
       totalEquipment: equipment.length,
       operational: byStatus.operational || 0,
-      scheduledTasks: records.filter((item) => ["scheduled", "in_progress"].includes(item.status)).length,
-      inProgress: records.filter((item) => item.status === "in_progress").length,
+      scheduledTasks: records.filter((item) => item.status === "scheduled").length,
       overdue: records.filter((item) => item.status === "overdue").length,
       completedThisQuarter,
       statusBreakdown: [

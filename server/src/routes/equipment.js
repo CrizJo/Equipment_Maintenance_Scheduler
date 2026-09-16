@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
       where: equipmentWhere(req),
       include: {
         records: {
-          where: { status: { in: ["scheduled", "in_progress", "overdue"] } },
+          where: { status: { in: ["scheduled", "overdue"] } },
           orderBy: { scheduledDate: "asc" },
           take: 3,
         },
@@ -59,7 +59,7 @@ router.post("/:id/complete-service", async (req, res) => {
       where: { id, ...equipmentWhere(req) },
       include: {
         records: {
-          where: { status: { in: ["scheduled", "in_progress", "overdue"] } },
+          where: { status: { in: ["scheduled", "overdue"] } },
           orderBy: { scheduledDate: "asc" },
           take: 1,
         },

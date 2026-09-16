@@ -97,7 +97,7 @@ export async function completeEquipmentService(id, { completionNotes } = {}) {
     where: { id },
     include: {
       records: {
-        where: { status: { in: ["scheduled", "in_progress", "overdue"] } },
+        where: { status: { in: ["scheduled", "overdue"] } },
         orderBy: { scheduledDate: "asc" },
       },
     },

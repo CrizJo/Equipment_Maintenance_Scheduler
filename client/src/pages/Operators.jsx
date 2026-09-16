@@ -110,7 +110,7 @@ export default function Operators() {
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Operators" value={operators.length} note="On the roster" />
         <StatCard label="Assigned equipment" value={totals.equipment} note="Across all operators" />
-        <StatCard label="Open tasks" value={totals.open} note="Scheduled, in progress, overdue" />
+        <StatCard label="Open tasks" value={totals.open} note="Scheduled and overdue" />
         <StatCard label="Overdue" value={totals.overdue} note="Needs attention" accent />
       </div>
 

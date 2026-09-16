@@ -208,7 +208,7 @@ async function main() {
         description: "Filter and coil inspection",
         assignedTo: "Tom Harris",
         scheduledDate: d("2026-09-15"),
-        status: "in_progress",
+        status: "scheduled",
       },
     ],
   });

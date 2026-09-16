@@ -35,7 +35,7 @@ export default function Dashboard() {
         <>
           <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard label="Total Equipment" value={stats.totalEquipment} note={`${stats.operational} operational`} />
-            <StatCard label="Scheduled Tasks" value={stats.scheduledTasks} note={`${stats.inProgress} in progress`} />
+            <StatCard label="Scheduled Tasks" value={stats.scheduledTasks} note="Planned maintenance" />
             <StatCard label="Overdue" value={stats.overdue} note="Requires attention" accent />
             <StatCard label="Completed" value={stats.completedThisQuarter} note="This quarter" />
           </div>

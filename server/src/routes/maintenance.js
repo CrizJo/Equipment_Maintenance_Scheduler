@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
     if (req.query.equipmentId) where.equipmentId = Number(req.query.equipmentId);
 
     if (req.query.upcoming === "true") {
-      where.status = { in: ["scheduled", "in_progress", "overdue"] };
+      where.status = { in: ["scheduled", "overdue"] };
     }
     if (req.query.past === "true") {
       where.status = "completed";
