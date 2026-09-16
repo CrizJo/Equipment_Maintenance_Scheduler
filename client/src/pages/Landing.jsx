@@ -1,5 +1,6 @@
 import { ArrowRight, CalendarCheck, ClipboardList, Search, Shield, Wrench } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useRole } from "../context/RoleContext.jsx";
 
 const FEATURES = [
   {
@@ -25,6 +26,9 @@ const FEATURES = [
 ];
 
 export default function Landing() {
+  const { role } = useRole();
+  const startTo = role === "Technician" ? "/equipment" : "/dashboard";
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#fbfbfd] text-[#1d1d1f]">
       <div className="pointer-events-none absolute inset-0">
@@ -41,7 +45,7 @@ export default function Landing() {
           <span className="text-[17px] font-semibold tracking-tight">EquipSync</span>
         </div>
         <Link
-          to="/dashboard"
+          to={startTo}
           className="inline-flex items-center gap-2 rounded-full bg-[#1d1d1f] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-black"
         >
           Get Started
@@ -67,7 +71,7 @@ export default function Landing() {
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              to="/dashboard"
+              to={startTo}
               className="inline-flex items-center gap-2 rounded-full bg-[#1d1d1f] px-8 py-4 text-[15px] font-semibold text-white shadow-xl shadow-black/15 transition hover:scale-[1.02] hover:bg-black"
             >
               Launch Dashboard

@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   CalendarDays,
   ChevronLeft,
@@ -9,11 +9,11 @@ import {
   Users,
   Wrench,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRole } from "../../context/RoleContext.jsx";
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["Admin", "Manager"] },
   { to: "/equipment", label: "Equipment", icon: Wrench },
   { to: "/operators", label: "Operators", icon: Users, roles: ["Admin", "Manager"] },
   { to: "/schedule", label: "Schedule", icon: CalendarDays },
@@ -24,6 +24,13 @@ export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const { role, setRole, technicianName, setTechnicianName, technicians } = useRole();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (role === "Technician" && location.pathname === "/dashboard") {
+      navigate("/equipment", { replace: true });
+    }
+  }, [role, location.pathname, navigate]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f5f7] text-[#1d1d1f]">

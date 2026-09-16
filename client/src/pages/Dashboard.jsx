@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link, Navigate } from "react-router-dom";
 import { AlertTriangle } from "lucide-react";
 import PageHeader from "../components/layout/PageHeader.jsx";
 import StatusDonut from "../components/dashboard/StatusDonut.jsx";
@@ -13,12 +14,17 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (role === "Technician") return;
     setLoading(true);
     api("/api/dashboard/stats")
       .then(setStats)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [role, technicianName]);
+
+  if (role === "Technician") {
+    return <Navigate to="/equipment" replace />;
+  }
 
   const alerts = [...(stats?.expired || []), ...(stats?.expiringSoon || [])];
 
@@ -34,10 +40,31 @@ export default function Dashboard() {
       {stats && (
         <>
           <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="Total Equipment" value={stats.totalEquipment} note={`${stats.operational} operational`} />
-            <StatCard label="Scheduled Tasks" value={stats.scheduledTasks} note="Planned maintenance" />
-            <StatCard label="Overdue" value={stats.overdue} note="Requires attention" accent />
-            <StatCard label="Completed" value={stats.completedThisQuarter} note="This quarter" />
+            <StatCard
+              to="/equipment"
+              label="Total Equipment"
+              value={stats.totalEquipment}
+              note={`${stats.operational} operational`}
+            />
+            <StatCard
+              to="/schedule"
+              label="Scheduled Tasks"
+              value={stats.scheduledTasks}
+              note="Planned maintenance"
+            />
+            <StatCard
+              to="/overdue"
+              label="Overdue"
+              value={stats.overdue}
+              note="Requires attention"
+              accent
+            />
+            <StatCard
+              to="/completed"
+              label="Completed"
+              value={stats.completedThisQuarter}
+              note="This quarter"
+            />
           </div>
 
           {alerts.length > 0 && (
@@ -63,12 +90,15 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ label, value, note, accent }) {
+function StatCard({ to, label, value, note, accent }) {
   return (
-    <div className="rounded-3xl bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+    <Link
+      to={to}
+      className="rounded-3xl bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)]"
+    >
       <p className={`text-xs font-medium ${accent ? "text-red-500" : "text-[#86868b]"}`}>{label}</p>
       <p className="mt-3 text-3xl font-semibold tracking-tight">{value}</p>
       <p className="mt-1 text-sm text-[#6e6e73]">{note}</p>
-    </div>
+    </Link>
   );
 }

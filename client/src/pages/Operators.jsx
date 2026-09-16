@@ -83,7 +83,7 @@ export default function Operators() {
   }
 
   if (role === "Technician") {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/equipment" replace />;
   }
 
   return (
